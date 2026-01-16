@@ -17,18 +17,29 @@ const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 /* Telegramga yuborish */
 async function sendToTelegram(text) {
-  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+  try {
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
 
-  await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: CHAT_ID,
-      text,
-      parse_mode: "HTML",
-    }),
-  });
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text,
+        parse_mode: "HTML",
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Telegram API error: ${errorText}`);
+    }
+  } catch (error) {
+    console.error("❌ Failed to send message to Telegram:", error);
+    throw error; // rethrow if caller should handle it
+  }
 }
+
 
 
 
